@@ -23,12 +23,12 @@ echo "Port       Host         Type                      Destination"
 # Create the TLSA entry for the own certificate, use it for all ports
 # (change "*" to a specific port like "_25" for port 25/SMTP, if needed).
 printf '*._tcp.%s. IN TLSA 3 1 1 %s\n' $(uname -n) $(openssl x509 \
-  -in /etc/letsencrypt/live/niklas-abel.de/cert.pem -noout -pubkey\
+  -in /etc/letsencrypt/live/$DOMAIN/cert.pem -noout -pubkey\
  | openssl pkey -pubin -outform DER | openssl dgst -sha256 -binary\
  | hexdump -ve '/1 "%02x"')
 
 # Create the TLSA entry for the letsencrypt trust anchor
-printf '*._tcp.niklas-abel.de. IN TLSA 2 1 1 '
+printf '*._tcp.%s. IN TLSA 2 1 1 ' $DOMAIN
 openssl x509 -in /etc/letsencrypt/live/$DOMAIN/le-x3-cross-signed.pem\
    -noout -pubkey | openssl rsa -pubin -outform DER 2>/dev/null\
   | openssl dgst -sha256 -hex | sed 's/^.* //'
